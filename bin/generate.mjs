@@ -78,7 +78,7 @@ Object.keys(cldrDateFiles).forEach(locale => {
         )
 
         fs.writeFileSync(
-            `${cjsCldrPath}/${locale}.cjs`,
+            `${cjsCldrPath}/${locale}.js`,
             `exports.countries = ${JSON.stringify(data.countries)}\n` +
             `exports.months = ${JSON.stringify(Object.values(data.months))}\n` +
             `exports.days = ${JSON.stringify(Object.values(data.days))}\n` +
