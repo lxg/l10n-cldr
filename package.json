@@ -1,6 +1,6 @@
 {
     "name": "@lxg/l10n-cldr",
-    "version": "0.0.2",
+    "version": "0.1.0",
     "description": "Provides CLDR data as ES modules",
     "type": "module",
     "scripts": {
@@ -8,8 +8,8 @@
     },
     "exports": {
         "./": {
-            "require" : "./dist/cjs/cldr/",
-            "default" : "./dist/esm/cldr/"
+            "require": "./dist/cjs/cldr/",
+            "default": "./dist/esm/cldr/"
         }
     },
     "files": [
