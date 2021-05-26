@@ -6,6 +6,12 @@
     "scripts": {
         "build": "./bin/generate.mjs"
     },
+    "exports": {
+        "./": {
+            "require" : "./dist/cjs/cldr/",
+            "default" : "./dist/esm/cldr/"
+        }
+    },
     "files": [
         "dist/*"
     ],
@@ -33,6 +39,7 @@
         "cldr-core": "^39.0.0",
         "cldr-dates-modern": "^39.0.0",
         "cldr-localenames-full": "^39.0.0",
-        "fast-glob": "^3.2.4"
+        "fast-glob": "^3.2.4",
+        "rimraf": "^3.0.2"
     }
 }
