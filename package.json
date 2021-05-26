@@ -1,0 +1,38 @@
+{
+    "name": "@lxg/l10n-cldr",
+    "version": "0.0.1",
+    "description": "Provides CLDR data as ES modules",
+    "type": "module",
+    "scripts": {
+        "build": "./bin/generate.mjs"
+    },
+    "files": [
+        "dist/*"
+    ],
+    "keywords": [
+        "internationalisation",
+        "i18n",
+        "localization",
+        "l10n",
+        "cldr",
+        "unicode",
+        "translation",
+        "translate",
+        "localize"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/lxg/l10n-cldr.git"
+    },
+    "author": {
+        "name": "Alexander Günsche",
+        "url": "https://lxg.de/"
+    },
+    "license": "ISC",
+    "devDependencies": {
+        "cldr-core": "^39.0.0",
+        "cldr-dates-modern": "^39.0.0",
+        "cldr-localenames-full": "^39.0.0",
+        "fast-glob": "^3.2.4"
+    }
+}
