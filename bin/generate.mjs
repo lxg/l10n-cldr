@@ -9,8 +9,8 @@ const __dirname = dirname(fileURLToPath(import.meta.url))
 
 const basePath = fs.realpathSync(`${__dirname}/..`)
 const nodePath = `${basePath}/node_modules`
-const cjsCldrPath = `${basePath}/dist/cjs/cldr`
-const esmCldrPath = `${basePath}/dist/esm/cldr`
+const cjsDataPath = `${basePath}/dist/cjs/data`
+const esmDataPath = `${basePath}/dist/esm/data`
 const validLocale = /^[a-z]{2}(-[A-Z]{2})?$/
 
 const cldrFirstDay = JSON.parse(fs.readFileSync(`${nodePath}/cldr-core/supplemental/weekData.json`))
@@ -50,7 +50,7 @@ fg.sync("**/territories.json", { cwd: cldrNamesPath }).forEach(file => {
     }
 })
 
-;[cjsCldrPath, esmCldrPath].forEach(path => {
+;[cjsDataPath, esmDataPath].forEach(path => {
     fs.existsSync(path) || fs.mkdirSync(path, { recursive: true })
     fs.readdirSync(path).length && rimraf.sync(`${path}/*`)
 })
@@ -68,7 +68,7 @@ Object.keys(cldrDateFiles).forEach(locale => {
         }
 
         fs.writeFileSync(
-            `${esmCldrPath}/${locale}.mjs`,
+            `${esmDataPath}/${locale}.mjs`,
             `export const countries = ${JSON.stringify(data.countries)}\n` +
             `export const months = ${JSON.stringify(Object.values(data.months))}\n` +
             `export const days = ${JSON.stringify(Object.values(data.days))}\n` +
@@ -78,7 +78,7 @@ Object.keys(cldrDateFiles).forEach(locale => {
         )
 
         fs.writeFileSync(
-            `${cjsCldrPath}/${locale}.cjs`,
+            `${cjsDataPath}/${locale}.cjs`,
             `exports.countries = ${JSON.stringify(data.countries)}\n` +
             `exports.months = ${JSON.stringify(Object.values(data.months))}\n` +
             `exports.days = ${JSON.stringify(Object.values(data.days))}\n` +

@@ -4,12 +4,16 @@
     "description": "Provides CLDR data as ES modules",
     "type": "module",
     "scripts": {
-        "build": "./bin/generate.mjs"
+        "build": "./bin/generate.mjs && cp ./src/* ./dist/"
     },
+    "main" : "./dist/cldr.mjs",
     "exports": {
+        ".": {
+            "default": "./dist/cldr.mjs"
+        },
         "./": {
-            "require": "./dist/cjs/cldr/",
-            "default": "./dist/esm/cldr/"
+            "require": "./dist/cjs/",
+            "default": "./dist/esm/"
         }
     },
     "files": [
