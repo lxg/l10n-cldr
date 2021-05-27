@@ -1,19 +1,19 @@
 {
     "name": "@lxg/l10n-cldr",
     "version": "0.2.0",
-    "description": "Provides CLDR data as ES modules",
+    "description": "Provides CLDR data as CommonJS and ES modules",
     "type": "module",
     "scripts": {
-        "build": "./bin/generate.mjs && cp ./src/* ./dist/"
+        "build": "./bin/generate.js && cp ./src/esm/* ./dist/esm/"
     },
-    "main": "./dist/cldr.mjs",
+    "main": "./dist/esm/cldr.js",
     "exports": {
         ".": {
-            "default": "./dist/cldr.mjs"
+            "import": "./dist/esm/cldr.js"
         },
         "./": {
-            "require": "./dist/cjs/",
-            "default": "./dist/esm/"
+            "require": "./dist/cjs/data/",
+            "import": "./dist/esm/data/"
         }
     },
     "files": [

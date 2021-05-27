@@ -68,7 +68,7 @@ Object.keys(cldrDateFiles).forEach(locale => {
         }
 
         fs.writeFileSync(
-            `${esmDataPath}/${locale}.mjs`,
+            `${esmDataPath}/${locale}.js`,
             `export const countries = ${JSON.stringify(data.countries)}\n` +
             `export const months = ${JSON.stringify(Object.values(data.months))}\n` +
             `export const days = ${JSON.stringify(Object.values(data.days))}\n` +
