@@ -4,7 +4,7 @@
     "description": "Provides CLDR data as CommonJS and ES modules",
     "type": "module",
     "scripts": {
-        "build": "./bin/generate.js && cp ./src/esm/* ./dist/esm/"
+        "build": "test -d ./dist && rm -r ./dist; mkdir -p ./dist/esm && ./bin/generate.js && cp ./src/esm/* ./dist/esm/"
     },
     "main": "./dist/esm/cldr.js",
     "exports": {
