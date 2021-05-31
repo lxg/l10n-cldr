@@ -1,6 +1,6 @@
 {
     "name": "@lxg/l10n-cldr",
-    "version": "0.2.2",
+    "version": "0.3.0",
     "description": "Provides CLDR data as CommonJS and ES modules",
     "type": "module",
     "scripts": {
