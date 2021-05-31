@@ -88,3 +88,24 @@ Object.keys(cldrDateFiles).forEach(locale => {
         )
     }
 })
+
+// supplemental (not country specific)
+
+const telephoneCodeData = JSON.parse(fs.readFileSync(`${basePath}/data/telephoneCodeData.json`).toString())
+    .supplemental.telephoneCodeData
+
+const phoneData = {}
+
+Object.keys(telephoneCodeData)
+    .filter(code => code.match(/^[A-Z]{2}$/))
+    .forEach(code => phoneData[code] = telephoneCodeData[code][0].telephoneCountryCode)
+
+fs.writeFileSync(
+    `${esmDataPath}/_common.js`,
+    `export const phonePrefixes = ${JSON.stringify(phoneData)}\n`
+)
+
+fs.writeFileSync(
+    `${cjsDataPath}/_common.cjs`,
+    `exports.phonePrefixes = ${JSON.stringify(phoneData)}\n`
+)
