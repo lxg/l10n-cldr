@@ -9,19 +9,22 @@ const __dirname = dirname(fileURLToPath(import.meta.url))
 
 const basePath = fs.realpathSync(`${__dirname}/..`)
 const nodePath = `${basePath}/node_modules`
+const cldrSupplPath = `${nodePath}/cldr-core/supplemental`
+const cldrDatePath = `${nodePath}/cldr-dates-modern/main`
+const cldrNamesPath = `${nodePath}/cldr-localenames-full/main`
 const cjsDataPath = `${basePath}/dist/cjs/data`
 const esmDataPath = `${basePath}/dist/esm/data`
 const validLocale = /^[a-z]{2}(-[A-Z]{2})?$/
 
-const cldrFirstDay = JSON.parse(fs.readFileSync(`${nodePath}/cldr-core/supplemental/weekData.json`))
-    .supplemental.weekData.firstDay
+const getSupplemental = (key) => {
+    return JSON.parse(fs.readFileSync(`${cldrSupplPath}/${key}.json`)).supplemental[key]
+}
 
-// days in cldrFirstDay are mon,sun … we need numbers however
-const firstDays = { sun: "0", mon: "1", fri: "5", sat: "6" }
+// first days by country, and mapping of day codes to indexes
+const cldrFirstDay = getSupplemental("weekData").firstDay
+const firstDays = { sun: 0, mon: 1, fri: 5, sat: 6 }
 
-const cldrDatePath = `${nodePath}/cldr-dates-modern/main`
-const cldrNamesPath = `${nodePath}/cldr-localenames-full/main`
-
+const codeMappings = getSupplemental("codeMappings")
 
 const cldrDateFiles = {}
 fg.sync("**/ca-gregorian.json", { cwd: cldrDatePath }).forEach(file => {
@@ -31,7 +34,9 @@ fg.sync("**/ca-gregorian.json", { cwd: cldrDatePath }).forEach(file => {
     }
 })
 
-const cldrCountryFiles = {}
+const cldrCountries = {}
+const cldrCountries3 = {}
+
 fg.sync("**/territories.json", { cwd: cldrNamesPath }).forEach(file => {
     const locale = file.replace(/\/.*$/, "")
 
@@ -39,12 +44,16 @@ fg.sync("**/territories.json", { cwd: cldrNamesPath }).forEach(file => {
         const countryList = JSON.parse(fs.readFileSync(`${cldrNamesPath}/${file}`).toString())
             .main[locale].localeDisplayNames.territories
 
-        cldrCountryFiles[locale] = {}
+        cldrCountries[locale] = {}
+        cldrCountries3[locale] = {}
 
         // add only entries with an ALPHA-2 code
         Object.keys(countryList).forEach(code => {
-            if (code.match(/^[A-Z]{2}$/) && code !== "ZZ") {
-                cldrCountryFiles[locale][code] = countryList[code]
+            const alpha3 = codeMappings[code]?._alpha3
+            if (alpha3 && code.match(/^[A-Z]{2}$/) && code !== "ZZ" && code !== "EU" && code !== "EZ" && !code.startsWith("X")) {
+
+                cldrCountries[locale][code] = countryList[code]
+                cldrCountries3[locale][alpha3] = countryList[code]
             }
         })
     }
@@ -58,34 +67,28 @@ fg.sync("**/territories.json", { cwd: cldrNamesPath }).forEach(file => {
 Object.keys(cldrDateFiles).forEach(locale => {
     const country = locale.substr(3, 2)
 
-    if (cldrCountryFiles[locale]) {
+    if (cldrCountries[locale]) {
         const data = {
-            days: cldrDateFiles[locale].main[locale].dates.calendars.gregorian.days["stand-alone"].wide,
-            daysShort: cldrDateFiles[locale].main[locale].dates.calendars.gregorian.days["stand-alone"].abbreviated,
-            months: cldrDateFiles[locale].main[locale].dates.calendars.gregorian.months["stand-alone"].wide,
-            monthsShort: cldrDateFiles[locale].main[locale].dates.calendars.gregorian.months["stand-alone"].abbreviated,
-            countries: cldrCountryFiles[locale]
+            countries: cldrCountries[locale],
+            countries3: cldrCountries3[locale],
+            days: Object.values(cldrDateFiles[locale].main[locale].dates.calendars.gregorian.days["stand-alone"].wide),
+            daysShort: Object.values(cldrDateFiles[locale].main[locale].dates.calendars.gregorian.days["stand-alone"].abbreviated),
+            months: Object.values(cldrDateFiles[locale].main[locale].dates.calendars.gregorian.months["stand-alone"].wide),
+            monthsShort: Object.values(cldrDateFiles[locale].main[locale].dates.calendars.gregorian.months["stand-alone"].abbreviated),
+            firstday : firstDays[cldrFirstDay[country] || "mon"]
         }
 
-        fs.writeFileSync(
-            `${esmDataPath}/${locale}.js`,
-            `export const countries = ${JSON.stringify(data.countries)}\n` +
-            `export const months = ${JSON.stringify(Object.values(data.months))}\n` +
-            `export const days = ${JSON.stringify(Object.values(data.days))}\n` +
-            `export const daysShort = ${JSON.stringify(Object.values(data.daysShort))}\n` +
-            `export const monthsShort = ${JSON.stringify(Object.values(data.monthsShort))}\n` +
-            `export const firstday = ${firstDays[cldrFirstDay[country] || "mon"]}\n`
-        )
+        const exports = {
+            "export const " : `${esmDataPath}/${locale}.js`,
+            "exports." : `${cjsDataPath}/${locale}.cjs`
+        }
 
-        fs.writeFileSync(
-            `${cjsDataPath}/${locale}.cjs`,
-            `exports.countries = ${JSON.stringify(data.countries)}\n` +
-            `exports.months = ${JSON.stringify(Object.values(data.months))}\n` +
-            `exports.days = ${JSON.stringify(Object.values(data.days))}\n` +
-            `exports.daysShort = ${JSON.stringify(Object.values(data.daysShort))}\n` +
-            `exports.monthsShort = ${JSON.stringify(Object.values(data.monthsShort))}\n` +
-            `exports.firstday = ${firstDays[cldrFirstDay[country] || "mon"]}\n`
-        )
+        Object.keys(exports).forEach(prefix => {
+            fs.writeFileSync(
+                exports[prefix],
+                Object.keys(data).map(key => `${prefix}${key} = ${JSON.stringify(data[key], null, 2)}`).join("\n\n")
+            )
+        })
     }
 })
 
