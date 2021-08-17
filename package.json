@@ -4,6 +4,8 @@
     "description": "Provides CLDR data as CommonJS and ES modules",
     "type": "module",
     "scripts": {
+        "lint": "for script in $(find src/ -iname '*.js'); do npx eslint $script; done",
+        "lint:fix": "for script in $(find src/ -iname '*.js'); do npx eslint $script --fix; done",
         "build": "test -d ./dist && rm -r ./dist; mkdir -p ./dist/esm && ./bin/generate.js && cp ./src/esm/* ./dist/esm/"
     },
     "main": "./dist/esm/cldr.js",
@@ -44,6 +46,7 @@
         "cldr-dates-modern": "^39.0.0",
         "cldr-localenames-full": "^39.0.0",
         "fast-glob": "^3.2.4",
-        "rimraf": "^3.0.2"
+        "rimraf": "^3.0.2",
+        "eslint": "^7.32.0"
     }
 }
